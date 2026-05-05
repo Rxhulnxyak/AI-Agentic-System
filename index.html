@@ -1,0 +1,459 @@
+    <style>
+        :root {
+            --bg-color: #030017;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --accent-purple: #9c27b0;
+            --accent-blue: #2196f3;
+            --accent-cyan: #00bcd4;
+            --text-white: #ffffff;
+            --orb-size: 150px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #030017 100%);
+            color: var(--text-white);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* The Siri Orb */
+        .orb-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .orb {
+            position: absolute;
+            width: var(--orb-size);
+            height: var(--orb-size);
+            border-radius: 50%;
+            background: linear-gradient(45deg, #ff00ff, #00ffff, #0000ff);
+            filter: blur(20px);
+            opacity: 0.6;
+            transition: 1s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: float 6s infinite ease-in-out;
+        }
+
+        .orb-inner {
+            position: absolute;
+            width: calc(var(--orb-size) * 0.7);
+            height: calc(var(--orb-size) * 0.7);
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 50px rgba(0, 188, 212, 0.4);
+            z-index: 2;
+        }
+
+        .orb.thinking {
+            animation: pulse-thinking 1.5s infinite alternate;
+            filter: blur(40px);
+            opacity: 0.9;
+            scale: 1.5;
+        }
+
+        .orb.speaking {
+            animation: wave 0.5s infinite alternate;
+            background: linear-gradient(45deg, #00ff88, #00ffff, #7700ff);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(10deg); }
+        }
+
+        @keyframes pulse-thinking {
+            0% { transform: scale(1); filter: blur(30px); }
+            100% { transform: scale(1.4); filter: blur(50px); }
+        }
+
+        @keyframes wave {
+            0% { border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%; }
+            100% { border-radius: 60% 40% 30% 70% / 50% 60% 40% 60%; }
+        }
+
+        /* Glassmorphic Dashboard */
+        .dashboard {
+            width: 95%;
+            max-width: 1100px;
+            height: 600px;
+            background: var(--glass-bg);
+            backdrop-filter: blur(30px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            grid-template-rows: auto auto 1fr auto;
+            gap: 20px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.6);
+            position: relative;
+        }
+
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .system-stats {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 25px;
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            background: rgba(0,0,0,0.2);
+            padding: 10px 20px;
+            border-radius: 20px;
+        }
+
+        .stat-item span {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .main-chat {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding-right: 10px;
+        }
+
+        .chat-container::-webkit-scrollbar { width: 5px; }
+        .chat-container::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
+
+        .message {
+            max-width: 85%;
+            padding: 15px 25px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.6;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .user-message {
+            align-self: flex-end;
+            background: linear-gradient(135deg, rgba(33, 150, 243, 0.2), rgba(33, 150, 243, 0.1));
+            border: 1px solid rgba(33, 150, 243, 0.3);
+            border-bottom-right-radius: 5px;
+        }
+
+        .ai-message {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom-left-radius: 5px;
+        }
+
+        .tool-call {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 12px;
+            color: var(--accent-cyan);
+            background: rgba(0,0,0,0.3);
+            padding: 8px 12px;
+            border-radius: 10px;
+            margin-top: 10px;
+            border-left: 3px solid var(--accent-cyan);
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .sidebar-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.4);
+            margin-bottom: 10px;
+        }
+
+        .tool-log {
+            font-size: 11px;
+            color: rgba(255,255,255,0.6);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .tool-log span { color: #4caf50; }
+
+        .input-area {
+            grid-column: 1 / -1;
+            display: flex;
+            gap: 15px;
+        }
+
+        input {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 18px 25px;
+            color: white;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--accent-blue); background: rgba(255, 255, 255, 0.07); }
+
+        button {
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-blue));
+            border: none;
+            border-radius: 20px;
+            padding: 0 35px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        button:hover { transform: scale(1.02); box-shadow: 0 0 30px rgba(156, 39, 176, 0.4); }
+
+        .voice-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 60px;
+            padding: 0;
+            justify-content: center;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .image-grid img {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .image-grid img:hover { transform: scale(1.1); }
+
+    </style>
+</head>
+<body>
+
+    <div class="orb-container">
+        <div id="mainOrb" class="orb"></div>
+        <div class="orb-inner"></div>
+    </div>
+
+    <div class="dashboard">
+        <div class="header">
+            <h1 style="font-weight: 300; letter-spacing: 2px;">KOLIMARII <span style="font-weight: 600; color: var(--accent-cyan); font-size: 14px;">v2.0</span></h1>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <div id="phoneStatus" class="phone-badge" style="background: rgba(33, 150, 243, 0.1); color: #2196f3; padding: 5px 15px; border-radius: 20px; font-size: 12px;">Phone: Checking...</div>
+                <button onclick="toggleSettings()" style="background: none; border: 1px solid rgba(255,255,255,0.1); padding: 8px 15px; font-size: 12px; border-radius: 20px;">⚙️ Configuration</button>
+                <div class="status-badge" style="background: rgba(0, 255, 0, 0.1); color: #4caf50; padding: 5px 15px; border-radius: 20px; font-size: 12px;">Neural Link: Active</div>
+            </div>
+        </div>
+
+        <div class="system-stats">
+            <div class="stat-item">Core Load: <span id="cpuUsage">0%</span></div>
+            <div class="stat-item">Synapse Memory: <span id="ramUsage">0%</span></div>
+            <div class="stat-item">Temporal: <span id="currentTime">--:--</span></div>
+        </div>
+
+        <div class="main-chat">
+            <div class="chat-container" id="chat">
+                <div class="message ai-message">System online. I am Kolimarii, your neural assistant. How shall we proceed?</div>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-title">Activity Log</div>
+            <div id="toolLogs" style="flex-grow: 1; overflow-y: auto;">
+                <div class="tool-log"><span>●</span> System Initialized</div>
+            </div>
+            <div class="sidebar-title" style="margin-top: 20px;">Memory Fragments</div>
+            <div id="memoryPeek" style="font-size: 11px; color: rgba(255,255,255,0.4);">
+                Awaiting new interactions...
+            </div>
+        </div>
+
+        <div class="input-area">
+            <button class="voice-btn" id="voiceToggle">🎤</button>
+            <input type="text" id="userInput" placeholder="Neural input required...">
+            <button onclick="sendMessage()">Transmit ➔</button>
+        </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" style="display:none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 450px; background: #0a0a1a; border: 1px solid var(--accent-blue); border-radius: 30px; padding: 40px; z-index: 1000; box-shadow: 0 0 100px rgba(0,0,0,0.9); backdrop-filter: blur(50px);">
+        <h2 style="margin-bottom: 25px; color: var(--accent-cyan); font-weight: 300;">Core Configuration</h2>
+        <div style="display: flex; flex-direction: column; gap: 20px;">
+            <div>
+                <label style="display: block; font-size: 11px; margin-bottom: 8px; opacity: 0.6; text-transform: uppercase;">Primary AI Uplink (OpenAI/Mistral/Anthropic)</label>
+                <input type="password" id="api_key" placeholder="Enter API Key" style="width: 100%; background: rgba(255,255,255,0.05);">
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <div>
+                    <label style="font-size: 11px; opacity: 0.6;">Voice Synthesis</label>
+                    <select id="voiceProvider" style="width: 100%; background: #1a1a2e; color: white; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;">
+                        <option value="pyttsx3">Local (Fast)</option>
+                        <option value="elevenlabs">ElevenLabs (HD)</option>
+                    </select>
+                </div>
+                <div>
+                    <label style="font-size: 11px; opacity: 0.6;">STT Engine</label>
+                    <select id="sttEngine" style="width: 100%; background: #1a1a2e; color: white; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 10px;">
+                        <option value="whisper">Whisper Base</option>
+                        <option value="openai">Whisper API</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
+                <button onclick="saveSettings()" style="flex: 1;">Save Sync</button>
+                <button onclick="toggleSettings()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); flex: 1;">Abort</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const orb = document.getElementById('mainOrb');
+
+        function toggleSettings() {
+            const modal = document.getElementById('settingsModal');
+            modal.style.display = modal.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const query = input.value.trim();
+            if (!query) return;
+
+            addMessage(query, 'user-message');
+            input.value = '';
+            setOrbState('thinking');
+
+            try {
+                const response = await fetch('http://localhost:5000/ask', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query })
+                });
+                const data = await response.json();
+                
+                setOrbState('idle');
+                
+                if (data.tool_calls && data.tool_calls.length > 0) {
+                    data.tool_calls.forEach(tool => {
+                        addToolLog(tool.name, tool.input);
+                    });
+                }
+
+                if (data.text) {
+                    addMessage(data.text, 'ai-message', data.tool_calls);
+                    setOrbState('speaking');
+                    setTimeout(() => setOrbState('idle'), data.text.length * 50); // Rough estimate
+                }
+            } catch (error) {
+                setOrbState('idle');
+                addMessage("Neural link severed. Ensure backend is active.", 'ai-message');
+            }
+        }
+
+        function setOrbState(state) {
+            orb.className = 'orb';
+            if (state !== 'idle') orb.classList.add(state);
+        }
+
+        function addMessage(text, className, tools = []) {
+            const chat = document.getElementById('chat');
+            const msgDiv = document.createElement('div');
+            msgDiv.className = `message ${className}`;
+            
+            // Check for image data in tool results or text (simplified for demo)
+            if (text.includes('web_search_images') || text.toLowerCase().includes('images for')) {
+                // We'd ideally parse the tool output properly here
+            }
+
+            msgDiv.innerText = text;
+            
+            if (tools && tools.length > 0) {
+                tools.forEach(t => {
+                    const toolDiv = document.createElement('div');
+                    toolDiv.className = 'tool-call';
+                    toolDiv.innerText = `⚙️ Executed: ${t.name}`;
+                    msgDiv.appendChild(toolDiv);
+                });
+            }
+
+            chat.appendChild(msgDiv);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function addToolLog(name, input) {
+            const logs = document.getElementById('toolLogs');
+            const log = document.createElement('div');
+            log.className = 'tool-log';
+            log.innerHTML = `<span>●</span> Thinking: ${name}`;
+            logs.prepend(log);
+        }
+
+        function updateStatus() {
+            fetch('http://localhost:5000/status')
+                .then(r => r.json())
+                .then(data => {
+                    document.getElementById('cpuUsage').innerText = `${data.cpu}%`;
+                    document.getElementById('ramUsage').innerText = `${data.ram}%`;
+                    document.getElementById('currentTime').innerText = data.time;
+                    document.getElementById('phoneStatus').innerText = `Phone: ${data.phone}`;
+                }).catch(() => {});
+        }
+
+        setInterval(updateStatus, 3000);
+        document.getElementById('userInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
